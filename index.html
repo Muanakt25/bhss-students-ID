@@ -7,13 +7,13 @@
     <style>
         /* Color Palette (Blue Gradient Theme) */
         :root {
-            --bg-color: #001D39;       /* Deep Navy Blue */
-            --card-bg: #0A4174;        /* Dark Blue */
-            --accent-blue: #49769F;    /* Medium Blue */
-            --light-blue-1: #4E8EA2;   /* Teal Blue */
-            --light-blue-2: #6EA2B3;   /* Soft Blue */
-            --bright-blue: #7BBDE8;    /* Bright Sky Blue */
-            --text-light: #BDD8E9;     /* Very Light Blue */
+            --bg-color: #001D39;       
+            --card-bg: #0A4174;        
+            --accent-blue: #49769F;    
+            --light-blue-1: #4E8EA2;   
+            --light-blue-2: #6EA2B3;   
+            --bright-blue: #7BBDE8;    
+            --text-light: #BDD8E9;     
         }
 
         body {
@@ -53,11 +53,11 @@
             color: var(--bright-blue);
             margin-bottom: 30px;
             font-weight: 500;
-            text-transform: uppercase; /* 'for staff only' kha capital letter deuhva ti lang tu tur */
+            text-transform: uppercase;
             letter-spacing: 2px;
         }
 
-        /* Controls (Select & Search Side-by-Side) */
+        /* Controls (Select & Search) */
         .controls-wrapper {
             display: flex;
             gap: 20px;
@@ -152,19 +152,18 @@
             border: 1px solid var(--accent-blue);
         }
 
-        /* POPUP MODAL (A mala lanna tur) */
+        /* POPUP MODAL (LIGHTBOX WITH NEXT/PREV) */
         .modal {
             display: none; 
             position: fixed; 
             z-index: 1000; 
-            padding-top: 60px; 
             left: 0;
             top: 0;
             width: 100%; 
             height: 100%; 
-            overflow: auto; 
-            background-color: rgba(0, 29, 57, 0.9); 
-            backdrop-filter: blur(5px);
+            overflow: hidden; 
+            background-color: rgba(0, 29, 57, 0.95); 
+            backdrop-filter: blur(8px);
             animation: fadeIn 0.3s;
         }
 
@@ -173,47 +172,90 @@
             to { opacity: 1; }
         }
 
+        .modal-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
         .modal-content {
-            margin: auto;
-            display: block;
-            max-width: 90%;
-            max-height: 80vh;
+            max-width: 85%;
+            max-height: 75vh;
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.8);
             border: 2px solid var(--bright-blue);
-            animation: zoomIn 0.3s;
+            animation: zoomIn 0.2s;
         }
 
         @keyframes zoomIn {
-            from { transform: scale(0.9); }
+            from { transform: scale(0.95); }
             to { transform: scale(1); }
         }
 
         .close-btn {
             position: absolute;
-            top: 20px;
+            top: 25px;
             right: 35px;
             color: #f1f1f1;
-            font-size: 40px;
+            font-size: 45px;
             font-weight: bold;
             transition: 0.3s;
             cursor: pointer;
+            z-index: 1010;
         }
 
         .close-btn:hover {
-            color: var(--bright-blue);
+            color: #ff6b6b;
         }
 
+        /* Navigation Buttons (Prev & Next) */
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(10, 65, 116, 0.7);
+            color: white;
+            border: 2px solid var(--accent-blue);
+            font-size: 30px;
+            font-weight: bold;
+            padding: 15px 22px;
+            cursor: pointer;
+            border-radius: 50%;
+            user-select: none;
+            transition: 0.3s;
+            z-index: 1005;
+        }
+
+        .nav-btn:hover {
+            background-color: var(--bright-blue);
+            border-color: #ffffff;
+            color: var(--bg-color);
+        }
+
+        .prev-btn { left: 30px; }
+        .next-btn { right: 30px; }
+
         #modalCaption {
-            margin: auto;
-            display: block;
-            width: 80%;
-            max-width: 700px;
             text-align: center;
             color: white;
-            padding: 15px 0;
-            font-size: 1.2rem;
+            padding: 20px 0;
+            font-size: 1.3rem;
             font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* Mobile-ah button lian em em lo turin */
+        @media (max-width: 600px) {
+            .nav-btn {
+                padding: 10px 16px;
+                font-size: 20px;
+            }
+            .prev-btn { left: 10px; }
+            .next-btn { right: 10px; }
         }
     </style>
 </head>
@@ -257,54 +299,53 @@
             </div>
     </div>
 
-    <div id="idModal" class="modal" onclick="closeModal()">
+    <div id="idModal" class="modal">
         <span class="close-btn" onclick="closeModal()">&times;</span>
-        <img class="modal-content" id="imgModalTarget">
-        <div id="modalCaption"></div>
+        
+        <button class="nav-btn prev-btn" onclick="changeImage(-1, event)">prev</button>
+        <button class="nav-btn next-btn" onclick="changeImage(1, event)">next</button>
+        
+        <div class="modal-container" onclick="closeModal()">
+            <img class="modal-content" id="imgModalTarget" onclick="event.stopPropagation()">
+            <div id="modalCaption"></div>
+        </div>
     </div>
 
     <script>
-        // Class tina student roll number zat (Max Roll Number)
         const classStudentCount = {
-            'IX_A': 60,
-            'IX_B': 60,
-            'IX_C': 61,
-            'X_A': 74,
-            'X_B': 72,
-            'XI_Arts_A': 83,
-            'XI_Arts_B': 83,
-            'XI_Commerce': 52,
-            'XI_Science_A': 71,
-            'XI_Science_B': 73,
-            'XII_Arts_A': 83,
-            'XII_Arts_B': 78,
-            'XII_Commerce': 45,
-            'XII_Science_A': 55,
-            'XII_Science_B': 51
+            'IX_A': 40, 'IX_B': 40, 'IX_C': 40, 'X_A': 35, 'X_B': 35,
+            'XI_Arts_A': 50, 'XI_Arts_B': 50, 'XI_Commerce': 30, 'XI_Science_A': 25, 'XI_Science_B': 25,
+            'XII_Arts_A': 45, 'XII_Arts_B': 45, 'XII_Commerce': 25, 'XII_Science_A': 20, 'XII_Science_B': 20
         };
 
-        // Grid chhunga ID zawng zawng load-na
+        // Tun thlaa thlalak en lai (Current Index) hriat reatna tur variable te
+        let currentRollArray = []; 
+        let currentActiveIndex = -1;
+        let currentClassText = "";
+        let currentClassFolder = "";
+
         function loadClassIDs() {
             const classSelect = document.getElementById('classSelect').value;
-            const classText = document.getElementById('classSelect').options[document.getElementById('classSelect').selectedIndex].text;
+            currentClassFolder = classSelect;
+            currentClassText = document.getElementById('classSelect').options[document.getElementById('classSelect').selectedIndex].text;
             const gridContainer = document.getElementById('idGridContainer');
             const galleryTitle = document.getElementById('galleryTitle');
             const searchInput = document.getElementById('searchRoll');
 
-            // Search box thianfai phawt tur class thlak hian
             searchInput.value = '';
-            galleryTitle.innerText = `${classText} Student IDs`;
+            galleryTitle.innerText = `${currentClassText} Student IDs`;
             gridContainer.innerHTML = '';
+            currentRollArray = []; // Array thianfai phawt tur
 
             const totalStudents = classStudentCount[classSelect] || 0;
 
             for (let i = 1; i <= totalStudents; i++) {
                 const imagePath = `${classSelect}/roll_${i}.jpg`;
+                currentRollArray.push(i); // Roll number tlar khawmna
 
-                // Card HTML siam chawpna
                 const cardHtml = `
-                    <div class="id-card-box" data-roll="${i}" onclick="openModal('${imagePath}', 'Roll Number: ${i} (${classText})')">
-                        <img src="${imagePath}" alt="Roll ${i}" onerror="this.parentElement.style.display='none';">
+                    <div class="id-card-box" data-roll="${i}" onclick="openModal(${i})">
+                        <img src="${imagePath}" alt="Roll ${i}" onerror="this.parentElement.style.direction='none'; this.parentElement.remove(); removeRollFromList(${i});">
                         <span class="roll-number-badge">Roll No: ${i}</span>
                     </div>
                 `;
@@ -312,41 +353,92 @@
             }
         }
 
-        // Roll Number zawnna (Live Filter)
+        // Folder a awm lo hrim hrim thupna leh List atanga paih rualna
+        function removeRollFromList(roll) {
+            currentRollArray = currentRollArray.filter(r => r !== roll);
+        }
+
         function filterRollNumber() {
             const searchValue = document.getElementById('searchRoll').value.trim();
             const cards = document.querySelectorAll('.id-card-box');
+            
+            // Filter hnu a Roll hmuh tur la awm te chauh kha array tharah kan dah leh thin ang nav-btn hman tlak nan
+            currentRollArray = [];
 
             cards.forEach(card => {
-                const cardRoll = card.getAttribute('data-roll');
+                const cardRoll = parseInt(card.getAttribute('data-roll'));
                 
                 if (searchValue === "") {
                     card.style.display = 'block';
-                } else if (cardRoll === searchValue) {
+                    currentRollArray.push(cardRoll);
+                } else if (cardRoll.toString() === searchValue) {
                     card.style.display = 'block'; 
+                    currentRollArray.push(cardRoll);
                 } else {
                     card.style.display = 'none';  
                 }
             });
         }
 
-        // Popup Modal Hawnna
-        function openModal(imgSrc, captionText) {
+        // Lightbox Popup Hawnna
+        function openModal(rollNumber) {
             const modal = document.getElementById('idModal');
+            currentActiveIndex = currentRollArray.indexOf(rollNumber);
+            
+            if (currentActiveIndex === -1) return; 
+
+            modal.style.display = "block";
+            updateModalContent();
+        }
+
+        // Popup chhung thlalak leh caption thlakna bik
+        function updateModalContent() {
             const modalImg = document.getElementById('imgModalTarget');
             const caption = document.getElementById('modalCaption');
             
-            modal.style.display = "block";
-            modalImg.src = imgSrc;
-            caption.innerText = captionText;
+            const activeRoll = currentRollArray[currentActiveIndex];
+            const imagePath = `${currentClassFolder}/roll_${activeRoll}.jpg`;
+
+            modalImg.src = imagePath;
+            caption.innerText = `Roll Number: ${activeRoll} (${currentClassText})`;
         }
 
-        // Popup Modal Kharna
+        // Next (+1) emaw Previous (-1) hmeha thlakna tur
+        function changeImage(direction, event) {
+            if (event) event.stopPropagation(); // Hmeh ruala popup lo inkhang ve ringawt tur venna
+            
+            if (currentRollArray.length <= 1) return;
+
+            currentActiveIndex += direction;
+
+            // A tawp ber dawtah a hmasa berah bawk va phei leh rawh se (Looping)
+            if (currentActiveIndex >= currentRollArray.length) {
+                currentActiveIndex = 0;
+            } else if (currentActiveIndex < 0) {
+                currentActiveIndex = currentRollArray.length - 1;
+            }
+
+            updateModalContent();
+        }
+
         function closeModal() {
             document.getElementById('idModal').style.display = "none";
         }
 
-        // Page inload ruala ti nung nghal tur
+        // Keyboard Arrow Keys (Left & Right) hmeha thlak kual theihna
+        document.addEventListener('keydown', function(event) {
+            const modal = document.getElementById('idModal');
+            if (modal.style.display === "block") {
+                if (event.key === "ArrowRight") {
+                    changeImage(1);
+                } else if (event.key === "ArrowLeft") {
+                    changeImage(-1);
+                } else if (event.key === "Escape") {
+                    closeModal();
+                }
+            }
+        });
+
         window.onload = function() {
             loadClassIDs();
         };
