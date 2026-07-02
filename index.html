@@ -4,65 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BHSS Students ID Gallery & Search</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+    
+    <!-- Real Authentication: Load Google Identity Services SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
     <style>
-        /* Color Palette (Blue Gradient Theme) */
+        /* ============ Token System ============ */
         :root {
-            --bg-color: #001D39;       
-            --card-bg: #0A4174;        
-            --accent-blue: #49769F;    
-            --light-blue-1: #4E8EA2;   
-            --light-blue-2: #6EA2B3;   
-            --bright-blue: #7BBDE8;    
-            --text-light: #BDD8E9;     
+            --navy-950: #061423;
+            --navy-900: #0C2339;
+            --navy-850: #102A44;
+            --navy-800: #16334F;
+            --brass: #C6A15B;
+            --brass-light: #E7CE94;
+            --ink-blue: #4C7FA6;
+            --text-primary: #EAF1F8;
+            --text-muted: #93A9BE;
         }
 
+        * { box-sizing: border-box; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-light);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background:
+                radial-gradient(ellipse 900px 500px at 15% -10%, rgba(76,127,166,0.18), transparent 60%),
+                radial-gradient(ellipse 800px 600px at 100% 10%, rgba(198,161,91,0.08), transparent 55%),
+                var(--navy-950);
+            color: var(--text-primary);
             margin: 0;
-            padding: 30px 20px;
+            padding: 40px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
         }
 
+        /* ============ Main Container ============ */
         .container {
             width: 100%;
-            max-width: 900px;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
+            max-width: 960px;
+            background: linear-gradient(180deg, var(--navy-900), #0A1D30);
+            padding: 42px 38px 38px;
+            border-radius: 18px;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04);
             text-align: center;
-            border: 1px solid rgba(123, 189, 232, 0.2);
-            box-sizing: border-box;
+            border: 1px solid var(--navy-800);
+            position: relative;
+            display: none; 
+        }
+
+        .container.visible {
+            display: block;
+            animation: riseIn 0.5s ease;
+        }
+
+        @keyframes riseIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .brand-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 6px;
+        }
+
+        .crest-logo {
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+            flex-shrink: 0;
         }
 
         h1 {
-            font-size: 2.5rem;
-            margin: 0 0 5px 0;
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 2.4rem;
+            margin: 0;
             color: #ffffff;
-            letter-spacing: 1.5px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 0.5px;
         }
 
         .subtitle {
-            font-size: 1rem;
-            color: var(--bright-blue);
-            margin-bottom: 30px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-bottom: 34px;
+            margin-top: 10px;
             font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
         }
 
-        /* Controls (Select & Search) */
+        .subtitle::before, .subtitle::after {
+            content: "—";
+            color: var(--navy-800);
+            margin: 0 12px;
+        }
+
+        /* ============ Controls ============ */
         .controls-wrapper {
             display: flex;
             gap: 20px;
-            max-width: 600px;
-            margin: 0 auto 30px auto;
+            max-width: 620px;
+            margin: 0 auto 36px auto;
             flex-wrap: wrap;
         }
 
@@ -76,101 +125,204 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: var(--bright-blue);
-            font-size: 1rem;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
         }
 
         select, input {
             width: 100%;
-            padding: 12px 15px;
+            padding: 13px 15px;
             border-radius: 10px;
-            border: 2px solid var(--accent-blue);
-            background-color: var(--bg-color);
+            border: 1.5px solid var(--navy-800);
+            background-color: var(--navy-850);
             color: #ffffff;
-            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
             box-sizing: border-box;
             outline: none;
-            transition: 0.3s;
+            transition: 0.25s;
         }
 
         select:focus, input:focus {
-            border-color: var(--bright-blue);
-            box-shadow: 0 0 12px rgba(123, 189, 232, 0.4);
+            border-color: var(--brass);
+            box-shadow: 0 0 0 4px rgba(198,161,91,0.15);
         }
 
-        /* ID Card Grid */
+        /* ============ Gallery & Cards ============ */
         .gallery-heading {
-            margin-top: 20px;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
+            margin-top: 10px;
+            margin-bottom: 22px;
+            font-family: 'Fraunces', serif;
+            font-size: 1.3rem;
+            font-weight: 500;
             color: #ffffff;
-            border-bottom: 2px solid var(--accent-blue);
-            padding-bottom: 10px;
+            border-bottom: 1px solid var(--navy-800);
+            padding-bottom: 14px;
             text-align: left;
         }
 
         .id-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 18px;
             margin-top: 20px;
         }
 
         .id-card-box {
-            background: var(--bg-color);
-            padding: 10px;
-            border-radius: 12px;
-            border: 1px solid var(--light-blue-1);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            transition: transform 0.2s, box-shadow 0.2s;
+            background: var(--navy-850);
+            padding: 12px 12px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--navy-800);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .id-card-box::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 18px;
+            width: 26px;
+            height: 10px;
+            background: var(--brass);
+            clip-path: polygon(15% 0, 85% 0, 100% 100%, 0% 100%);
+            opacity: 0.85;
         }
 
         .id-card-box:hover {
-            transform: scale(1.03);
-            border-color: var(--bright-blue);
-            box-shadow: 0 8px 25px rgba(123, 189, 232, 0.3);
+            transform: translateY(-4px);
+            border-color: var(--brass);
+            box-shadow: 0 14px 30px rgba(198,161,91,0.18);
         }
 
         .id-card-box img {
             width: 100%;
             height: auto;
-            border-radius: 8px;
+            border-radius: 6px;
             display: block;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.04);
         }
 
         .roll-number-badge {
             display: inline-block;
-            margin-top: 8px;
-            padding: 4px 10px;
-            background-color: var(--card-bg);
-            color: var(--bright-blue);
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            border: 1px solid var(--accent-blue);
+            margin-top: 10px;
+            padding: 4px 11px;
+            background-color: transparent;
+            color: var(--brass-light);
+            border-radius: 20px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--navy-800);
         }
 
-        /* POPUP MODAL (LIGHTBOX WITH NEXT/PREV) */
+        /* ============ Sign-in Gate ============ */
+        .signin-gate {
+            width: 100%;
+            max-width: 380px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: riseIn 0.5s ease;
+        }
+
+        .signin-gate.hidden { display: none; }
+
+        .badge {
+            width: 100%;
+            background: linear-gradient(180deg, var(--navy-900), #0A1D30);
+            border-radius: 20px;
+            border: 1px solid var(--navy-800);
+            box-shadow: 0 30px 70px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04);
+            padding: 40px 30px 32px;
+            position: relative;
+            text-align: center;
+        }
+
+        .badge::before {
+            content: "";
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 28px;
+            height: 28px;
+            background: var(--navy-950);
+            border: 1px solid var(--navy-800);
+            border-radius: 50%;
+        }
+
+        .badge-crest-logo {
+            width: 85px;
+            height: 85px;
+            object-fit: contain;
+            margin: 0 auto 16px;
+            display: block;
+        }
+
+        .badge h2 {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin: 0 0 6px;
+            color: #ffffff;
+        }
+
+        .badge p.lede {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin: 0 0 24px;
+            line-height: 1.5;
+        }
+
+        .google-btn-wrapper {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 24px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.82rem;
+            margin-top: 8px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .badge-footnote {
+            margin-top: 22px;
+            font-size: 0.7rem;
+            color: #5C7185;
+            letter-spacing: 0.5px;
+        }
+
+        /* ============ POPUP MODAL (LIGHTBOX) ============ */
         .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1000; 
+            display: none;
+            position: fixed;
+            z-index: 1000;
             left: 0;
             top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: hidden; 
-            background-color: rgba(0, 29, 57, 0.95); 
-            backdrop-filter: blur(8px);
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: rgba(6, 20, 35, 0.95);
+            backdrop-filter: blur(10px);
             animation: fadeIn 0.3s;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .modal-container {
             position: relative;
@@ -185,43 +337,37 @@
         .modal-content {
             max-width: 85%;
             max-height: 75vh;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            border: 2px solid var(--bright-blue);
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            border: 1px solid var(--brass);
             animation: zoomIn 0.2s;
         }
 
-        @keyframes zoomIn {
-            from { transform: scale(0.95); }
-            to { transform: scale(1); }
-        }
+        @keyframes zoomIn { from { transform: scale(0.95); } to { transform: scale(1); } }
 
         .close-btn {
             position: absolute;
             top: 25px;
             right: 35px;
             color: #f1f1f1;
-            font-size: 45px;
-            font-weight: bold;
+            font-size: 40px;
+            font-weight: 300;
             transition: 0.3s;
             cursor: pointer;
             z-index: 1010;
         }
 
-        .close-btn:hover {
-            color: #ff6b6b;
-        }
+        .close-btn:hover { color: var(--brass-light); }
 
-        /* Navigation Buttons (Prev & Next) */
         .nav-btn {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background-color: rgba(10, 65, 116, 0.7);
+            background-color: rgba(16, 42, 68, 0.7);
             color: white;
-            border: 2px solid var(--accent-blue);
-            font-size: 30px;
-            font-weight: bold;
+            border: 1.5px solid var(--navy-800);
+            font-size: 26px;
+            font-weight: 400;
             padding: 15px 22px;
             cursor: pointer;
             border-radius: 50%;
@@ -231,9 +377,9 @@
         }
 
         .nav-btn:hover {
-            background-color: var(--bright-blue);
-            border-color: #ffffff;
-            color: var(--bg-color);
+            background-color: var(--brass);
+            border-color: var(--brass);
+            color: var(--navy-950);
         }
 
         .prev-btn { left: 30px; }
@@ -243,27 +389,67 @@
             text-align: center;
             color: white;
             padding: 20px 0;
-            font-size: 1.3rem;
-            font-weight: bold;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1rem;
+            font-weight: 500;
             letter-spacing: 1px;
         }
 
-        /* Mobile-ah button lian em em lo turin */
         @media (max-width: 600px) {
-            .nav-btn {
-                padding: 10px 16px;
-                font-size: 20px;
-            }
+            .container { padding: 30px 20px; }
+            h1 { font-size: 1.9rem; }
+            .nav-btn { padding: 10px 16px; font-size: 20px; }
             .prev-btn { left: 10px; }
             .next-btn { right: 10px; }
+            .badge { padding: 34px 20px 26px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>BHSS STUDENTS ID</h1>
-        <div class="subtitle">for staff only</div>
+    <!-- ============ Sign-in Gate ============ -->
+    <div class="signin-gate" id="signinGate">
+        <div class="badge">
+            <!-- Render School Logo Identity Document Image -->
+            <img src="BHSS bLUE.png" alt="BHSS Logo" class="badge-crest-logo">
+            <h2>BHSS Students ID</h2>
+            <h2>Staff Access</h2>
+            <p class="lede">Sign in with your school Google account to open the students ID.</p>
+
+            <div class="google-btn-wrapper">
+                <!-- Native Core Script Authentication Hook Anchor Context -->
+                <div id="g_id_onload"
+                     data-client_id="861013290714-gnktj2v5ca3mq0iamhat8qv3dbc8bveg.apps.googleusercontent.com"
+                     data-context="signin"
+                     data-callback="handleCredentialResponse"
+                     data-auto_select="false"
+                     data-close_on_tap_outside="false">
+                </div>
+
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-shape="rectangular"
+                     data-theme="outline"
+                     data-text="signin_with"
+                     data-size="large"
+                     data-logo_alignment="left">
+                </div>
+                
+                <div class="error-message" id="authError">Access restricted to @baptisthss.in identities.</div>
+            </div>
+
+            <div class="badge-footnote">BHSS · Internal Staff Use Only</div>
+        </div>
+    </div>
+
+    <!-- ============ Main Gallery ============ -->
+    <div class="container" id="mainContainer">
+        <div class="brand-row">
+            <!-- School Logo Component Persistent Presence inside Main Workspace -->
+            <img src="BHSS bLUE.jpg" alt="BHSS Logo" class="crest-logo">
+            <h1 id="userGreeting">BHSS Students ID</h1>
+        </div>
+        <div class="subtitle">Staff Registry Access</div>
 
         <div class="controls-wrapper">
             <div class="form-group">
@@ -294,17 +480,14 @@
         </div>
 
         <div class="gallery-heading" id="galleryTitle">Student IDs</div>
-        
-        <div class="id-grid" id="idGridContainer">
-            </div>
+        <div class="id-grid" id="idGridContainer"></div>
     </div>
 
+    <!-- ============ Lightbox Modal ============ -->
     <div id="idModal" class="modal">
         <span class="close-btn" onclick="closeModal()">&times;</span>
-        
-        <button class="nav-btn prev-btn" onclick="changeImage(-1, event)">prev</button>
-        <button class="nav-btn next-btn" onclick="changeImage(1, event)">next</button>
-        
+        <button class="nav-btn prev-btn" onclick="changeImage(-1, event)">&#8249;</button>
+        <button class="nav-btn next-btn" onclick="changeImage(1, event)">&#8250;</button>
         <div class="modal-container" onclick="closeModal()">
             <img class="modal-content" id="imgModalTarget" onclick="event.stopPropagation()">
             <div id="modalCaption"></div>
@@ -318,11 +501,63 @@
             'XII_Arts_A': 45, 'XII_Arts_B': 45, 'XII_Commerce': 25, 'XII_Science_A': 20, 'XII_Science_B': 20
         };
 
-        // Tun thlaa thlalak en lai (Current Index) hriat reatna tur variable te
         let currentRollArray = []; 
         let currentActiveIndex = -1;
         let currentClassText = "";
         let currentClassFolder = "";
+
+        // Core Base64 JWT Parser
+        function decodeJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (error) {
+                return null;
+            }
+        }
+
+        // Handle incoming secure response payload
+        function handleCredentialResponse(response) {
+            const payload = decodeJwt(response.credential);
+            
+            if (!payload) {
+                showAuthError("Authentication structural failure. Try again.");
+                return;
+            }
+
+            // Domain Identity Gatekeeping Logic
+            const targetDomain = "baptisthss.in";
+            if (payload.hd !== targetDomain && !payload.email.endsWith("@" + targetDomain)) {
+                showAuthError(`Access Denied: Must use a @${targetDomain} account.`);
+                return;
+            }
+
+            sessionStorage.setItem('bhss_authenticated', 'true');
+            sessionStorage.setItem('bhss_user_name', payload.given_name || payload.name);
+
+            transitionToGallery(payload.given_name || payload.name);
+        }
+
+        function showAuthError(msg) {
+            const errEl = document.getElementById('authError');
+            errEl.innerText = msg;
+            errEl.style.display = "block";
+        }
+
+        function transitionToGallery(name) {
+            document.getElementById('signinGate').classList.add('hidden');
+            document.getElementById('mainContainer').classList.add('visible');
+            
+            if(name) {
+                document.getElementById('userGreeting').innerText = `BHSS Student IDs (Staff: ${name})`;
+            }
+
+            loadClassIDs();
+        }
 
         function loadClassIDs() {
             const classSelect = document.getElementById('classSelect').value;
@@ -335,17 +570,17 @@
             searchInput.value = '';
             galleryTitle.innerText = `${currentClassText} Student IDs`;
             gridContainer.innerHTML = '';
-            currentRollArray = []; // Array thianfai phawt tur
+            currentRollArray = [];
 
             const totalStudents = classStudentCount[classSelect] || 0;
 
             for (let i = 1; i <= totalStudents; i++) {
                 const imagePath = `${classSelect}/roll_${i}.jpg`;
-                currentRollArray.push(i); // Roll number tlar khawmna
+                currentRollArray.push(i);
 
                 const cardHtml = `
                     <div class="id-card-box" data-roll="${i}" onclick="openModal(${i})">
-                        <img src="${imagePath}" alt="Roll ${i}" onerror="this.parentElement.style.direction='none'; this.parentElement.remove(); removeRollFromList(${i});">
+                        <img src="${imagePath}" alt="Roll ${i}" onerror="this.parentElement.remove(); removeRollFromList(${i});">
                         <span class="roll-number-badge">Roll No: ${i}</span>
                     </div>
                 `;
@@ -353,7 +588,6 @@
             }
         }
 
-        // Folder a awm lo hrim hrim thupna leh List atanga paih rualna
         function removeRollFromList(roll) {
             currentRollArray = currentRollArray.filter(r => r !== roll);
         }
@@ -361,13 +595,10 @@
         function filterRollNumber() {
             const searchValue = document.getElementById('searchRoll').value.trim();
             const cards = document.querySelectorAll('.id-card-box');
-            
-            // Filter hnu a Roll hmuh tur la awm te chauh kha array tharah kan dah leh thin ang nav-btn hman tlak nan
             currentRollArray = [];
 
             cards.forEach(card => {
                 const cardRoll = parseInt(card.getAttribute('data-roll'));
-                
                 if (searchValue === "") {
                     card.style.display = 'block';
                     currentRollArray.push(cardRoll);
@@ -380,22 +611,17 @@
             });
         }
 
-        // Lightbox Popup Hawnna
         function openModal(rollNumber) {
             const modal = document.getElementById('idModal');
             currentActiveIndex = currentRollArray.indexOf(rollNumber);
-            
             if (currentActiveIndex === -1) return; 
-
             modal.style.display = "block";
             updateModalContent();
         }
 
-        // Popup chhung thlalak leh caption thlakna bik
         function updateModalContent() {
             const modalImg = document.getElementById('imgModalTarget');
             const caption = document.getElementById('modalCaption');
-            
             const activeRoll = currentRollArray[currentActiveIndex];
             const imagePath = `${currentClassFolder}/roll_${activeRoll}.jpg`;
 
@@ -403,46 +629,40 @@
             caption.innerText = `Roll Number: ${activeRoll} (${currentClassText})`;
         }
 
-        // Next (+1) emaw Previous (-1) hmeha thlakna tur
         function changeImage(direction, event) {
-            if (event) event.stopPropagation(); // Hmeh ruala popup lo inkhang ve ringawt tur venna
-            
+            if (event) event.stopPropagation();
             if (currentRollArray.length <= 1) return;
 
             currentActiveIndex += direction;
-
-            // A tawp ber dawtah a hmasa berah bawk va phei leh rawh se (Looping)
             if (currentActiveIndex >= currentRollArray.length) {
                 currentActiveIndex = 0;
             } else if (currentActiveIndex < 0) {
                 currentActiveIndex = currentRollArray.length - 1;
             }
-
             updateModalContent();
         }
 
+        // Lightbox Close Lifecycle Hook
         function closeModal() {
             document.getElementById('idModal').style.display = "none";
         }
 
-        // Keyboard Arrow Keys (Left & Right) hmeha thlak kual theihna
         document.addEventListener('keydown', function(event) {
             const modal = document.getElementById('idModal');
             if (modal.style.display === "block") {
-                if (event.key === "ArrowRight") {
-                    changeImage(1);
-                } else if (event.key === "ArrowLeft") {
-                    changeImage(-1);
-                } else if (event.key === "Escape") {
-                    closeModal();
-                }
+                if (event.key === "ArrowRight") changeImage(1);
+                else if (event.key === "ArrowLeft") changeImage(-1);
+                else if (event.key === "Escape") closeModal();
             }
         });
 
         window.onload = function() {
-            loadClassIDs();
+            const isAuthenticated = sessionStorage.getItem('bhss_authenticated');
+            if (isAuthenticated === 'true') {
+                const savedName = sessionStorage.getItem('bhss_user_name');
+                transitionToGallery(savedName);
+            }
         };
     </script>
-
 </body>
 </html>
