@@ -392,6 +392,52 @@
             letter-spacing: 1px;
         }
 
+
+        /* ============ Back to Top Button ============ */
+        #backToTop {
+            position: fixed;
+            right: 28px;
+            bottom: 28px;
+            z-index: 900;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 17px;
+            border: 1px solid var(--brass-light);
+            border-radius: 999px;
+            background: var(--brass);
+            color: var(--navy-950);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+            cursor: pointer;
+            transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
+        }
+
+        #backToTop:hover {
+            background: var(--brass-light);
+            transform: translateY(-3px);
+        }
+
+        #backToTop.visible {
+            display: flex;
+        }
+
+        #backToTop:focus-visible {
+            outline: 3px solid #ffffff;
+            outline-offset: 3px;
+        }
+
+        @media (max-width: 600px) {
+            #backToTop {
+                right: 16px;
+                bottom: 16px;
+                padding: 11px 14px;
+            }
+        }
+
         @media (max-width: 600px) {
             .container { padding: 30px 20px; }
             h1 { font-size: 1.9rem; }
@@ -490,6 +536,12 @@
             <div id="modalCaption"></div>
         </div>
     </div>
+
+    <!-- Floating Back to Top Button -->
+    <button id="backToTop" type="button" aria-label="Back to top" title="Back to top"
+            onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+        <span aria-hidden="true">↑</span> Back to Top
+    </button>
 
     <script>
         const classStudentCount = {
@@ -652,6 +704,13 @@
                 else if (event.key === "Escape") closeModal();
             }
         });
+
+        // Show or hide the Back to Top button based on scroll position.
+        const backToTopButton = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', function() {
+            backToTopButton.classList.toggle('visible', window.scrollY > 300);
+        }, { passive: true });
 
         window.onload = function() {
             // BYPASS ACTIVATED: Automatically bypasses authentication and unlocks the layout container smoothly[cite: 1]
